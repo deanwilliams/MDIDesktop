@@ -113,6 +113,20 @@ public class MDIDesktopPane extends JDesktopPane {
 			}
 		}
 	}
+	
+	/**
+	 * Iconfiy all internal frames
+	 */
+	public void minimizeAllFrames() {
+		JInternalFrame[] allFrames = getAllFrames();
+		for (int i = 0; i < allFrames.length; i++) {
+			try {
+				allFrames[i].setIcon(true);
+			} catch (PropertyVetoException e) {
+				allFrames[i].toBack();
+			}
+		}
+	}
 
 	/**
 	 * Sets all component size properties ( maximum, minimum, preferred) to the

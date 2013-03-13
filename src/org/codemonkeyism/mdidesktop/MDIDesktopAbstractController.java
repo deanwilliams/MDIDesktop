@@ -46,6 +46,12 @@ public abstract class MDIDesktopAbstractController {
 		}
 	}
 	
+	public void minimiseAllInternalFrames() {
+		if (view != null) {
+			view.minimiseAllInternalFrames();
+		}
+	}
+	
 	public int getChildFrameCount() {
 		if (view != null) {
 			return view.getDesktopPane().getAllFrames().length;

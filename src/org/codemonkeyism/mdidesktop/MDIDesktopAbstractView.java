@@ -175,4 +175,11 @@ public abstract class MDIDesktopAbstractView {
 	public void tileInternalFrames() {
 		desktopPane.tileFrames();
 	}
+	
+	/**
+	 * Minimise all the internal frames
+	 */
+	public void minimiseAllInternalFrames() {
+		desktopPane.minimizeAllFrames();
+	}
 }
