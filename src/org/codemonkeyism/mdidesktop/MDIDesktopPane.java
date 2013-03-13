@@ -86,7 +86,7 @@ public class MDIDesktopPane extends JDesktopPane {
 	public void cascadeFrames() {
 		int x = 0;
 		int y = 0;
-		JInternalFrame allFrames[] = getAllFrames();
+		JInternalFrame[] allFrames = getAllFrames();
 
 		manager.setNormalSize();
 		// FRAME_OFFSET;
@@ -101,14 +101,16 @@ public class MDIDesktopPane extends JDesktopPane {
 	 * Tile all internal frames
 	 */
 	public void tileFrames() {
-		java.awt.Component allFrames[] = getAllFrames();
-		manager.setNormalSize();
-		int frameHeight = getBounds().height / allFrames.length;
-		int y = 0;
-		for (int i = 0; i < allFrames.length; i++) {
-			allFrames[i].setSize(getBounds().width, frameHeight);
-			allFrames[i].setLocation(0, y);
-			y = y + frameHeight;
+		java.awt.Component[] allFrames = getAllFrames();
+		if (allFrames.length > 0) {
+			manager.setNormalSize();
+			int frameHeight = getBounds().height / allFrames.length;
+			int y = 0;
+			for (int i = 0; i < allFrames.length; i++) {
+				allFrames[i].setSize(getBounds().width, frameHeight);
+				allFrames[i].setLocation(0, y);
+				y = y + frameHeight;
+			}
 		}
 	}
 
