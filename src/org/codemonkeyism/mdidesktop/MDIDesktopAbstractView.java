@@ -65,6 +65,10 @@ public abstract class MDIDesktopAbstractView {
 		scrollPane.setViewportView(desktopPane);
 	}
 	
+	public JFrame getFrame() {
+		return frame;
+	}
+	
 	/**
 	 * Set the main frame's bounds
 	 * 
