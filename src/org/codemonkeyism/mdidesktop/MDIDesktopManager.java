@@ -13,6 +13,7 @@ import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 /**
@@ -128,12 +129,12 @@ public class MDIDesktopManager extends DefaultDesktopManager {
 	private int computeDesktopIconWidth(int minWidth, String title) {
 		FontRenderContext frc = new FontRenderContext(null, false, false);
 		Font font = UIManager.getFont("InternalFrame.titleFont");
-		
+
 		int maxTitleWidth = 0;
 
 		Rectangle2D r = new TextLayout(title, font, frc).getBounds();
 		int textWidth = (int) r.getWidth();
-		
+
 		if (textWidth > maxTitleWidth) {
 			maxTitleWidth = textWidth;
 		}
@@ -145,35 +146,39 @@ public class MDIDesktopManager extends DefaultDesktopManager {
 	 * Calculate the needed internal desktop size and set it
 	 */
 	protected void resizeDesktop() {
-		int x = 0;
-		int y = 0;
-		JScrollPane scrollPane = getScrollPane();
-		Insets scrollInsets = getScrollPaneInsets();
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				int x = 0;
+				int y = 0;
+				JScrollPane scrollPane = getScrollPane();
+				Insets scrollInsets = getScrollPaneInsets();
 
-		if (scrollPane != null) {
-			JInternalFrame allFrames[] = desktop.getAllFrames();
-			for (int i = 0; i < allFrames.length; i++) {
-				if (allFrames[i].getX() + allFrames[i].getWidth() > x) {
-					x = allFrames[i].getX() + allFrames[i].getWidth();
-				}
-				if (allFrames[i].getY() + allFrames[i].getHeight() > y) {
-					y = allFrames[i].getY() + allFrames[i].getHeight();
+				if (scrollPane != null) {
+					JInternalFrame allFrames[] = desktop.getAllFrames();
+					for (int i = 0; i < allFrames.length; i++) {
+						if (allFrames[i].getX() + allFrames[i].getWidth() > x) {
+							x = allFrames[i].getX() + allFrames[i].getWidth();
+						}
+						if (allFrames[i].getY() + allFrames[i].getHeight() > y) {
+							y = allFrames[i].getY() + allFrames[i].getHeight();
+						}
+					}
+					Dimension d = scrollPane.getVisibleRect().getSize();
+					if (scrollPane.getBorder() != null) {
+						d.setSize(d.getWidth() - scrollInsets.left
+								- scrollInsets.right, d.getHeight()
+								- scrollInsets.top - scrollInsets.bottom);
+					}
+
+					if (x <= d.getWidth())
+						x = ((int) d.getWidth()) - 20;
+					if (y <= d.getHeight())
+						y = ((int) d.getHeight()) - 20;
+					desktop.setAllSize(x, y);
+					scrollPane.invalidate();
+					scrollPane.validate();
 				}
 			}
-			Dimension d = scrollPane.getVisibleRect().getSize();
-			if (scrollPane.getBorder() != null) {
-				d.setSize(
-						d.getWidth() - scrollInsets.left - scrollInsets.right,
-						d.getHeight() - scrollInsets.top - scrollInsets.bottom);
-			}
-
-			if (x <= d.getWidth())
-				x = ((int) d.getWidth()) - 20;
-			if (y <= d.getHeight())
-				y = ((int) d.getHeight()) - 20;
-			desktop.setAllSize(x, y);
-			scrollPane.invalidate();
-			scrollPane.validate();
-		}
+		});
 	}
 }

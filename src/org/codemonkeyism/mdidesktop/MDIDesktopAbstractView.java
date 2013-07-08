@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Toolkit;
 import java.beans.PropertyVetoException;
 
-import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
@@ -61,14 +60,14 @@ public abstract class MDIDesktopAbstractView {
 
 		desktopPane = new MDIDesktopPane();
 		desktopPane.setBackground(Color.LIGHT_GRAY);
-		desktopPane.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
+		// desktopPane.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
 		scrollPane.setViewportView(desktopPane);
 	}
-	
+
 	public JFrame getFrame() {
 		return frame;
 	}
-	
+
 	/**
 	 * Set the main frame's bounds
 	 * 
@@ -103,7 +102,7 @@ public abstract class MDIDesktopAbstractView {
 		}
 		menuBar.add(menu);
 	}
-	
+
 	/**
 	 * Add an internal child frame to the desktop frame.
 	 * 
@@ -124,7 +123,7 @@ public abstract class MDIDesktopAbstractView {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Remove an internal child frame from the desktop
 	 * 
@@ -134,7 +133,7 @@ public abstract class MDIDesktopAbstractView {
 		childFrame.setVisible(false);
 		desktopPane.remove(childFrame);
 	}
-	
+
 	/**
 	 * Set the frame's icon
 	 * 
@@ -144,7 +143,7 @@ public abstract class MDIDesktopAbstractView {
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(
 				getClass().getResource(iconPath)));
 	}
-	
+
 	/**
 	 * Set the main frame title
 	 * 
@@ -165,7 +164,7 @@ public abstract class MDIDesktopAbstractView {
 		}
 		return desktopPane;
 	}
-	
+
 	/**
 	 * Cascade all the internal frames
 	 */
@@ -179,7 +178,7 @@ public abstract class MDIDesktopAbstractView {
 	public void tileInternalFrames() {
 		desktopPane.tileFrames();
 	}
-	
+
 	/**
 	 * Minimise all the internal frames
 	 */
