@@ -1,5 +1,7 @@
 package org.codemonkeyism.mdidesktop;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import javax.swing.JInternalFrame;
 
 public abstract class MDIDesktopAbstractController {
@@ -8,7 +10,7 @@ public abstract class MDIDesktopAbstractController {
 
 	public MDIDesktopAbstractController(MDIDesktopAbstractView view) {
 		super();
-		this.view = view;
+		this.view = checkNotNull(view);
 	}
 
 	/**
@@ -23,12 +25,14 @@ public abstract class MDIDesktopAbstractController {
 	public abstract void stop();
 
 	public <T extends MDIDesktopFrame> void addFrame(T childFrame) {
+		checkNotNull(childFrame);
 		if (view != null) {
 			view.addFrame(childFrame);
 		}
 	}
 	
 	public <T extends JInternalFrame> void removeFrame(T childFrame) {
+		checkNotNull(childFrame);
 		if (view != null) {
 			view.removeFrame(childFrame);
 		}

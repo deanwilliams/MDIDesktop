@@ -79,6 +79,7 @@ public class MDIDesktopFrame extends JInternalFrame {
 		super(title, resizable, closeable, maximizable, iconifiable);
 		setParentFrame(parent);
 		setFocusTraversalKeysEnabled(false);
+
 		if (parent != null && parent instanceof MDIDesktopFrame) {
 			((MDIDesktopFrame) parent).setChildFrame(MDIDesktopFrame.this);
 		}
@@ -138,7 +139,11 @@ public class MDIDesktopFrame extends JInternalFrame {
 	 * @return hasChildFrame
 	 */
 	public boolean hasChildFrame() {
-		return (childFrame != null);
+		if (childFrame == null) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 	protected void addFrameVetoListener() {

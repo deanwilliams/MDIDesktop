@@ -114,7 +114,9 @@ public abstract class MDIDesktopAbstractView {
 	 */
 	public <T extends MDIDesktopFrame> void addFrame(T childFrame) {
 		// Add the new child frame to the parent desktop panel
-		childFrame.setParentFrame(desktopPane);
+		if (childFrame.getParentFrame() == null) {
+			childFrame.setParentFrame(desktopPane);
+		}
 		desktopPane.add(childFrame);
 		childFrame.setVisible(true);
 		try {
@@ -130,7 +132,11 @@ public abstract class MDIDesktopAbstractView {
 	 * @param childFrame
 	 */
 	public <T extends JInternalFrame> void removeFrame(T childFrame) {
-		childFrame.setVisible(false);
+		try {
+			childFrame.setClosed(true);
+		} catch (PropertyVetoException e) {
+			e.printStackTrace();
+		}
 		desktopPane.remove(childFrame);
 	}
 
