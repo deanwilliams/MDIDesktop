@@ -1,7 +1,6 @@
 package org.codemonkeyism.mdidesktop;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Toolkit;
 import java.beans.PropertyVetoException;
 
@@ -59,7 +58,7 @@ public abstract class MDIDesktopAbstractView {
 		frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
 
 		desktopPane = new MDIDesktopPane();
-		desktopPane.setBackground(Color.LIGHT_GRAY);
+		// desktopPane.setBackground(Color.LIGHT_GRAY);
 		// desktopPane.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
 		scrollPane.setViewportView(desktopPane);
 	}

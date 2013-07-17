@@ -2,11 +2,16 @@ package org.codemonkeyism.mdidesktop;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Point;
+import java.awt.Graphics2D;
 import java.beans.PropertyVetoException;
 
+import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
+import javax.swing.UIDefaults;
+import javax.swing.UIManager;
+
+import com.sun.java.swing.Painter;
 
 /**
  * An extension of JDesktopPane that supports often used MDI functionality. This
@@ -48,19 +53,23 @@ public class MDIDesktopPane extends JDesktopPane {
 	 * @return
 	 */
 	public Component add(JInternalFrame frame) {
-		JInternalFrame[] array = getAllFrames();
-		Point p;
+		// JInternalFrame[] array = getAllFrames();
+		// Point p;
 
 		Component retval = super.add(frame);
 
-		if (array.length > 0) {
-			p = array[0].getLocation();
-			p.x = p.x + FRAME_OFFSET;
-			p.y = p.y + FRAME_OFFSET;
-		} else {
-			p = new Point(0, 0);
-		}
-		frame.setLocation(p.x, p.y);
+//		if (array.length > 0) {
+//			p = array[0].getLocation();
+//			p.x = p.x + FRAME_OFFSET;
+//			p.y = p.y + FRAME_OFFSET;
+//		} else {
+//			p = new Point(0, 0);
+//		}
+		
+//		frame.setLocation(p.x, p.y);
+		
+		frame.setLocation(frame.getBounds().x, frame.getBounds().y);
+		
 		moveToFront(frame);
 		frame.setVisible(true);
 		try {
@@ -139,7 +148,9 @@ public class MDIDesktopPane extends JDesktopPane {
 					}
 				}
 
-				getDesktopManager().resizeFrame(f, x, y, w, h);
+				if (f.isResizable()) {
+					getDesktopManager().resizeFrame(f, x, y, w, h);
+				}
 				x += w;
 			}
 			y += h; // start the next row
@@ -189,5 +200,24 @@ public class MDIDesktopPane extends JDesktopPane {
 			manager.resizeDesktop();
 		}
 	}
+
+	@Override
+    public void updateUI() {
+        if ("Nimbus".equals(UIManager.getLookAndFeel().getName())) {
+            UIDefaults map = new UIDefaults();
+            Painter<JComponent> painter = new Painter<JComponent>() {
+
+                @Override
+                public void paint(Graphics2D g, JComponent c, int w, int h) {
+                    // file using normal desktop color
+                    g.setColor(UIManager.getDefaults().getColor("desktop"));
+                    g.fillRect(0, 0, w, h);
+                }
+            };
+            map.put("DesktopPane[Enabled].backgroundPainter", painter);
+            putClientProperty("Nimbus.Overrides", map);
+        }
+        super.updateUI();
+    }
 
 }
