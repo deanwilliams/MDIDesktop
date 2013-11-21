@@ -3,6 +3,7 @@ package org.codemonkeyism.mdidesktop;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
@@ -257,6 +258,18 @@ public class MDIDesktopFrame extends JInternalFrame {
 			((MDIDesktopFrame) parent).childOpening();
 		}
 		super.show();
+	}
+
+	public void setLocationRelativeTo(MDIDesktopFrame parentView) {
+		Point parentLocation = parentView.getLocation();
+
+		int height = parentView.getHeight();
+		int width = parentView.getWidth();
+
+		int newY = parentLocation.y + ((height / 2) - (getHeight() / 2));
+		int newX = parentLocation.x + ((width / 2) - (getWidth() / 2));
+
+		setLocation(newX, newY);
 	}
 
 	/**
