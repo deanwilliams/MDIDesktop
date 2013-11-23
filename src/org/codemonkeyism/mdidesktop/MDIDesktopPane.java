@@ -8,10 +8,9 @@ import java.beans.PropertyVetoException;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
+import javax.swing.Painter;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
-
-import com.sun.java.swing.Painter;
 
 /**
  * An extension of JDesktopPane that supports often used MDI functionality. This
@@ -213,6 +212,7 @@ public class MDIDesktopPane extends JDesktopPane {
                     g.setColor(UIManager.getDefaults().getColor("desktop"));
                     g.fillRect(0, 0, w, h);
                 }
+
             };
             map.put("DesktopPane[Enabled].backgroundPainter", painter);
             putClientProperty("Nimbus.Overrides", map);
