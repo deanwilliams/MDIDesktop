@@ -1,6 +1,7 @@
 package org.codemonkeyism.mdidesktop;
 
 import java.awt.BorderLayout;
+import java.awt.Rectangle;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
@@ -22,6 +23,8 @@ public class MDIDesktopOptionFrame extends MDIDesktopFrame {
 
 		super(parentComponent, title, false, false, false, false);
 
+		Rectangle rec = optionPane.getBounds();
+		setBounds(rec.x, rec.y, rec.width, rec.height);
 		optionPane.setValue(null); // default to null
 
 		if (desktopPane == null
