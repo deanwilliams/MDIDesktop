@@ -35,14 +35,6 @@ public class MDIDesktopFrame extends JInternalFrame {
 	protected JComponent focusOwner;
 	private boolean wasCloseable;
 
-	public MDIDesktopFrame() {
-		initialize(); // here to allow netbeans to use class in gui builder
-	}
-
-	protected void initialize() {
-		// Do nothing
-	}
-
 	public MDIDesktopFrame(JComponent parent) {
 		this(parent, null);
 	}
@@ -140,11 +132,7 @@ public class MDIDesktopFrame extends JInternalFrame {
 	 * @return hasChildFrame
 	 */
 	public boolean hasChildFrame() {
-		if (childFrame == null) {
-			return false;
-		} else {
-			return true;
-		}
+		return (childFrame != null);
 	}
 
 	protected void addFrameVetoListener() {
@@ -155,12 +143,21 @@ public class MDIDesktopFrame extends JInternalFrame {
 				if (evt.getPropertyName().equals(
 						JInternalFrame.IS_SELECTED_PROPERTY)
 						&& evt.getNewValue().equals(Boolean.TRUE)) {
+					if (isIcon) {
+						setIcon(false);
+					}
 					if (hasChildFrame()) {
 						childFrame.setSelected(true);
 						if (childFrame.isIcon()) {
 							childFrame.setIcon(false);
 						}
 						throw new PropertyVetoException("no!", evt);
+					}
+				} else if (evt.getPropertyName().equals(
+						JInternalFrame.IS_ICON_PROPERTY)
+						&& evt.getNewValue().equals(Boolean.TRUE)) {
+					if (getParentFrame() instanceof MDIDesktopFrame) {
+						((MDIDesktopFrame) getParentFrame()).setIcon(true);
 					}
 				}
 			}
@@ -291,10 +288,10 @@ public class MDIDesktopFrame extends JInternalFrame {
 
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					if (modalFrame.isSelected() == false) {
+					if (!modalFrame.isSelected()) {
 						try {
 							modalFrame.setSelected(true);
-							if (modalFrame.hasChildFrame() == false) {
+							if (!modalFrame.hasChildFrame()) {
 								setVisible(false);
 							}
 						} catch (PropertyVetoException e1) {

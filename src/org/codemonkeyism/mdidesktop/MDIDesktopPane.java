@@ -52,20 +52,7 @@ public class MDIDesktopPane extends JDesktopPane {
 	 * @return
 	 */
 	public Component add(JInternalFrame frame) {
-		// JInternalFrame[] array = getAllFrames();
-		// Point p;
-
-		Component retval = super.add(frame);
-
-//		if (array.length > 0) {
-//			p = array[0].getLocation();
-//			p.x = p.x + FRAME_OFFSET;
-//			p.y = p.y + FRAME_OFFSET;
-//		} else {
-//			p = new Point(0, 0);
-//		}
-		
-//		frame.setLocation(p.x, p.y);
+		Component returnValue = super.add(frame);
 		
 		frame.setLocation(frame.getBounds().x, frame.getBounds().y);
 		
@@ -77,7 +64,7 @@ public class MDIDesktopPane extends JDesktopPane {
 			frame.toBack();
 		}
 		checkDesktopSize();
-		return retval;
+		return returnValue;
 	}
 
 	/**
