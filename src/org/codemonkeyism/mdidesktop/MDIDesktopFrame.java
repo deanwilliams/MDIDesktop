@@ -165,7 +165,7 @@ public class MDIDesktopFrame extends JInternalFrame {
 	}
 
 	/**
-	 * Method to control the display of the glasspane, dependant on the frame
+	 * Method to control the display of the glasspane, dependent on the frame
 	 * being active or not
 	 */
 	protected void addFrameListener() {
