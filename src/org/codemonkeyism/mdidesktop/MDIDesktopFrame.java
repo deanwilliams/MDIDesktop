@@ -9,8 +9,6 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
@@ -35,13 +33,7 @@ public class MDIDesktopFrame extends JInternalFrame {
 	protected JComponent focusOwner;
 	private boolean wasCloseable;
 
-	public MDIDesktopFrame() {
-		initialize(); // here to allow netbeans to use class in gui builder
-	}
-
-	protected void initialize() {
-		// Do nothing
-	}
+	protected Object returnValue;
 
 	public MDIDesktopFrame(JComponent parent) {
 		this(parent, null);
@@ -140,11 +132,7 @@ public class MDIDesktopFrame extends JInternalFrame {
 	 * @return hasChildFrame
 	 */
 	public boolean hasChildFrame() {
-		if (childFrame == null) {
-			return false;
-		} else {
-			return true;
-		}
+		return (childFrame != null);
 	}
 
 	protected void addFrameVetoListener() {
@@ -155,12 +143,21 @@ public class MDIDesktopFrame extends JInternalFrame {
 				if (evt.getPropertyName().equals(
 						JInternalFrame.IS_SELECTED_PROPERTY)
 						&& evt.getNewValue().equals(Boolean.TRUE)) {
+					if (isIcon) {
+						setIcon(false);
+					}
 					if (hasChildFrame()) {
 						childFrame.setSelected(true);
 						if (childFrame.isIcon()) {
 							childFrame.setIcon(false);
 						}
 						throw new PropertyVetoException("no!", evt);
+					}
+				} else if (evt.getPropertyName().equals(
+						JInternalFrame.IS_ICON_PROPERTY)
+						&& evt.getNewValue().equals(Boolean.TRUE)) {
+					if (getParentFrame() instanceof MDIDesktopFrame) {
+						((MDIDesktopFrame) getParentFrame()).setIcon(true);
 					}
 				}
 			}
@@ -175,8 +172,30 @@ public class MDIDesktopFrame extends JInternalFrame {
 		addInternalFrameListener(new InternalFrameAdapter() {
 
 			@Override
+			public void internalFrameIconified(InternalFrameEvent e) {
+				if (hasChildFrame()) {
+					try {
+						childFrame.setIcon(true);
+					} catch (PropertyVetoException e1) {
+						// Do nothing
+					}
+				}
+			}
+
+			@Override
+			public void internalFrameDeiconified(InternalFrameEvent e) {
+				if (getParentFrame() instanceof MDIDesktopFrame) {
+					try {
+						((MDIDesktopFrame) getParentFrame()).setIcon(true);
+					} catch (PropertyVetoException e1) {
+						// Do nothing
+					}
+				}
+			}
+
+			@Override
 			public void internalFrameActivated(InternalFrameEvent e) {
-				if (hasChildFrame() == true) {
+				if (hasChildFrame()) {
 					getGlassPane().setVisible(true);
 					grabFocus();
 				} else {
@@ -186,7 +205,7 @@ public class MDIDesktopFrame extends JInternalFrame {
 
 			@Override
 			public void internalFrameDeactivated(InternalFrameEvent e) {
-				if (hasChildFrame() == true) {
+				if (hasChildFrame()) {
 					getGlassPane().setVisible(true);
 					grabFocus();
 				} else {
@@ -224,8 +243,17 @@ public class MDIDesktopFrame extends JInternalFrame {
 						setSelected(true);
 						focusOwner.grabFocus();
 					} catch (PropertyVetoException ex) {
-						Logger.getLogger(MDIDesktopFrame.class.getName()).log(
-								Level.SEVERE, null, ex);
+						// This should only happen in the event that one child
+						// frame is closing and another is being opened
+						// immediately
+						if (hasChildFrame()) {
+							try {
+								childFrame.setSelected(true);
+							} catch (PropertyVetoException e) {
+								// Do nothing
+							}
+							childFrame.moveToFront();
+						}
 					}
 				}
 			});
@@ -260,6 +288,11 @@ public class MDIDesktopFrame extends JInternalFrame {
 		super.show();
 	}
 
+	/**
+	 * Set the location of this frame relative to the parent frame
+	 * 
+	 * @param parentView
+	 */
 	public void setLocationRelativeTo(MDIDesktopFrame parentView) {
 		Point parentLocation = parentView.getLocation();
 
@@ -291,10 +324,10 @@ public class MDIDesktopFrame extends JInternalFrame {
 
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					if (modalFrame.isSelected() == false) {
+					if (!modalFrame.isSelected()) {
 						try {
 							modalFrame.setSelected(true);
-							if (modalFrame.hasChildFrame() == false) {
+							if (!modalFrame.hasChildFrame()) {
 								setVisible(false);
 							}
 						} catch (PropertyVetoException e1) {
@@ -312,4 +345,5 @@ public class MDIDesktopFrame extends JInternalFrame {
 			g.fillRect(0, 0, getWidth(), getHeight());
 		}
 	}
+
 }
