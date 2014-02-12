@@ -186,7 +186,7 @@ public class MDIDesktopFrame extends JInternalFrame {
 			public void internalFrameDeiconified(InternalFrameEvent e) {
 				if (getParentFrame() instanceof MDIDesktopFrame) {
 					try {
-						((MDIDesktopFrame) getParentFrame()).setIcon(true);
+						((MDIDesktopFrame) getParentFrame()).setIcon(false);
 					} catch (PropertyVetoException e1) {
 						// Do nothing
 					}
