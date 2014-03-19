@@ -301,6 +301,9 @@ public class MDIDesktopFrame extends JInternalFrame {
 
 		int newY = parentLocation.y + ((height / 2) - (getHeight() / 2));
 		int newX = parentLocation.x + ((width / 2) - (getWidth() / 2));
+		
+		newY = newY < 0 ? 0 : newY;
+		newX = newX < 0 ? 0 : newX;
 
 		setLocation(newX, newY);
 	}
