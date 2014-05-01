@@ -1,6 +1,7 @@
 package org.codemonkeyism.mdidesktop;
 
 import java.awt.BorderLayout;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.beans.PropertyVetoException;
 
@@ -25,6 +26,8 @@ public abstract class MDIDesktopAbstractView {
 	private JFrame frame;
 	private MDIDesktopPane desktopPane;
 	private JMenuBar menuBar;
+
+	private Point lastLocation;
 
 	/**
 	 * All hail the mighty constructor
@@ -116,6 +119,30 @@ public abstract class MDIDesktopAbstractView {
 		if (childFrame.getParentFrame() == null) {
 			childFrame.setParentFrame(desktopPane);
 		}
+		Point childLocation = childFrame.getLocation();
+		if (lastLocation == null && childLocation.x == 0
+				&& childLocation.y == 0) {
+			lastLocation = new Point(0, 0);
+		} else {
+			if (childLocation.x == 0 && childLocation.y == 0) {
+				int newX = lastLocation.x + MDIDesktopPane.FRAME_OFFSET;
+				int newY = lastLocation.y + MDIDesktopPane.FRAME_OFFSET;
+				newX = newX < 0 ? 0 : newX;
+				newY = newY < 0 ? 0 : newY;
+				
+				int bottomPosition = newY + childFrame.getHeight();
+				if (newX > desktopPane.getSize().getWidth()) {
+					newX = 0;
+				}
+				if (bottomPosition > desktopPane.getSize().getHeight()) {
+					newY = 0;
+				}
+				
+				Point newLocation = new Point(newX, newY);
+				lastLocation = newLocation;
+				childFrame.setLocation(newLocation);
+			}
+		}
 		desktopPane.add(childFrame);
 		childFrame.setVisible(true);
 		try {
@@ -131,6 +158,12 @@ public abstract class MDIDesktopAbstractView {
 	 * @param childFrame
 	 */
 	public synchronized <T extends JInternalFrame> void removeFrame(T childFrame) {
+		if (lastLocation != null) {
+			if (childFrame.getLocation().x == lastLocation.x
+					&& childFrame.getLocation().y == lastLocation.y) {
+				lastLocation = null;
+			}
+		}
 		try {
 			childFrame.setClosed(true);
 		} catch (PropertyVetoException e) {

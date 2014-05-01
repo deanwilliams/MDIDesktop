@@ -23,7 +23,8 @@ public class MDIDesktopPane extends JDesktopPane {
 
 	private static final long serialVersionUID = 1L;
 
-	private static int FRAME_OFFSET = 20;
+	public static final int FRAME_OFFSET = 20;
+	
 	private MDIDesktopManager manager;
 
 	public MDIDesktopPane() {
