@@ -14,6 +14,7 @@ import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
@@ -114,6 +115,9 @@ public class MDIDesktopFrame extends JInternalFrame {
 	 * @param childFrame
 	 */
 	public void setChildFrame(MDIDesktopFrame childFrame) {
+		if (hasChildFrame() && childFrame != null) {
+			System.out.println("We already have a child!");
+		}
 		this.childFrame = childFrame;
 	}
 
@@ -221,7 +225,15 @@ public class MDIDesktopFrame extends JInternalFrame {
 			@Override
 			public void internalFrameClosing(InternalFrameEvent e) {
 				if (parent != null && parent instanceof MDIDesktopFrame) {
-					((MDIDesktopFrame) parent).childClosing();
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
+							MDIDesktopFrame mdiFrame = (MDIDesktopFrame) parent;
+							if (mdiFrame.hasChildFrame()
+									&& mdiFrame.childFrame.isClosed()) {
+								((MDIDesktopFrame) parent).childClosing();
+							}
+						}
+					});
 				}
 			}
 		});
@@ -301,7 +313,7 @@ public class MDIDesktopFrame extends JInternalFrame {
 
 		int newY = parentLocation.y + ((height / 2) - (getHeight() / 2));
 		int newX = parentLocation.x + ((width / 2) - (getWidth() / 2));
-		
+
 		newY = newY < 0 ? 0 : newY;
 		newX = newX < 0 ? 0 : newX;
 
