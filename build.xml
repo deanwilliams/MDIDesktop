@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE project>
+<project name="MDIDesktop" default="deploy" basedir=".">
+
+	<!-- Deploy this mofo -->
+	<target name="deploy" depends="compile">
+		<jar jarfile="${deploy}/${app.name}.jar" basedir="${deploy}/${classes}">
+		</jar>
+		<jar jarfile="${destination}/${app.name}.jar" basedir="${deploy}/${classes}">
+		</jar>
+		<copy todir="${deploy}">
+			<fileset dir="${lib}" />
+		</copy>
+		<copy todir="${destination}">
+			<fileset dir="${lib}" />
+		</copy>
+	</target>
+
+	<!-- Do a fresh build of the projects code -->
+	<target name="compile" depends="prepareLibs">
+		<echo>Compile time!</echo>
+		<javac srcdir="${src}" destdir="${deploy}/${classes}" includeantruntime="false">
+			<classpath refid="project.class.path" />
+		</javac>
+	</target>
+
+	<!-- Prepare the projects this project relies on -->
+	<target name="prepareLibs" depends="prepareDirectories">
+		<copy todir="${deploy}/${lib}">
+			<fileset dir="${lib}" />
+		</copy>
+	</target>
+
+	<!-- Make sure all the directories exist -->
+	<target name="prepareDirectories" depends="cleanStart">
+		<echo>Re-create the deployment folder structure</echo>
+		<mkdir dir="${deploy}" />
+		<mkdir dir="${deploy}/${classes}" />
+		<mkdir dir="${deploy}/${lib}" />
+	</target>
+
+	<!-- Delete the directories if they already exist -->
+	<target name="cleanStart" depends="initialise">
+		<echo>Clean the deploy folder</echo>
+		<delete dir="${deploy}" />
+	</target>
+
+	<!-- Initialise all the things! -->
+	<target name="initialise">
+		<echo>********************************************************************************</echo>
+		<echo>**                            Building MDIDesktop                             **</echo>
+		<echo>********************************************************************************</echo>
+		<echo>Initialise all the things!</echo>
+
+		<!-- Setup the timestamp -->
+		<tstamp />
+
+		<property name="app.name" value="MDIDesktop" />
+		<property name="src" value="src" />
+		<property name="lib" value="lib" />
+		<property name="classes" value="classes" />
+
+		<property name="deploy" value="C:\Apps\${app.name}" />
+
+		<!-- The final destination. This gets overriden by other build scripts -->
+		<property name="destination" value="${deploy}" />
+
+		<echo>Setup the classpath</echo>
+		<path id="project.class.path">
+			<fileset dir="${lib}">
+				<include name="**/*.jar" />
+			</fileset>
+			<fileset dir="${deploy}/${lib}">
+				<include name="**/*.jar" />
+			</fileset>
+		</path>
+	</target>
+
+</project>
