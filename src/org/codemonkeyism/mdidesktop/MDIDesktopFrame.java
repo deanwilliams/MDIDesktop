@@ -34,6 +34,8 @@ public class MDIDesktopFrame extends JInternalFrame {
 	protected JComponent focusOwner;
 	private boolean wasCloseable;
 
+	private boolean glassPaneLocked = false;
+
 	protected Object returnValue;
 
 	public MDIDesktopFrame(JComponent parent) {
@@ -142,6 +144,7 @@ public class MDIDesktopFrame extends JInternalFrame {
 	protected void addFrameVetoListener() {
 		addVetoableChangeListener(new VetoableChangeListener() {
 
+			@Override
 			public void vetoableChange(PropertyChangeEvent evt)
 					throws PropertyVetoException {
 				if (evt.getPropertyName().equals(
@@ -226,6 +229,7 @@ public class MDIDesktopFrame extends JInternalFrame {
 			public void internalFrameClosing(InternalFrameEvent e) {
 				if (parent != null && parent instanceof MDIDesktopFrame) {
 					SwingUtilities.invokeLater(new Runnable() {
+						@Override
 						public void run() {
 							MDIDesktopFrame mdiFrame = (MDIDesktopFrame) parent;
 							if (mdiFrame.hasChildFrame()
@@ -245,10 +249,10 @@ public class MDIDesktopFrame extends JInternalFrame {
 	 */
 	protected void childClosing() {
 		setClosable(wasCloseable);
-		getGlassPane().setVisible(false);
 		if (focusOwner != null) {
 			java.awt.EventQueue.invokeLater(new Runnable() {
 
+				@Override
 				public void run() {
 					try {
 						moveToFront();
@@ -271,8 +275,6 @@ public class MDIDesktopFrame extends JInternalFrame {
 			});
 			focusOwner.grabFocus();
 		}
-		getGlassPane().setCursor(
-				Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		setChildFrame(null);
 	}
 
@@ -354,6 +356,14 @@ public class MDIDesktopFrame extends JInternalFrame {
 		}
 
 		@Override
+		public void setVisible(boolean value) {
+			if (!value && glassPaneLocked) {
+				return;
+			}
+			super.setVisible(value);
+		}
+
+		@Override
 		public void paint(Graphics g) {
 			super.paint(g);
 			g.setColor(new Color(255, 255, 255, 100));
@@ -361,4 +371,7 @@ public class MDIDesktopFrame extends JInternalFrame {
 		}
 	}
 
+	public void lockGlassPane(boolean value) {
+		glassPaneLocked = value;
+	}
 }
