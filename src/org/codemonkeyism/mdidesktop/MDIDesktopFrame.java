@@ -1,11 +1,13 @@
 package org.codemonkeyism.mdidesktop;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Cursor;
+import java.awt.FocusTraversalPolicy;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
@@ -52,13 +54,11 @@ public class MDIDesktopFrame extends JInternalFrame {
 		this(parent, title, resizable, false);
 	}
 
-	public MDIDesktopFrame(JComponent parent, String title, boolean resizable,
-			boolean closeable) {
+	public MDIDesktopFrame(JComponent parent, String title, boolean resizable, boolean closeable) {
 		this(parent, title, resizable, closeable, false);
 	}
 
-	public MDIDesktopFrame(JComponent parent, String title, boolean resizable,
-			boolean closeable, boolean maximizable) {
+	public MDIDesktopFrame(JComponent parent, String title, boolean resizable, boolean closeable, boolean maximizable) {
 		this(parent, title, resizable, closeable, maximizable, false);
 	}
 
@@ -72,8 +72,8 @@ public class MDIDesktopFrame extends JInternalFrame {
 	 * @param maximizable
 	 * @param iconifiable
 	 */
-	public MDIDesktopFrame(JComponent parent, String title, boolean resizable,
-			boolean closeable, boolean maximizable, boolean iconifiable) {
+	public MDIDesktopFrame(JComponent parent, String title, boolean resizable, boolean closeable, boolean maximizable,
+			boolean iconifiable) {
 		super(title, resizable, closeable, maximizable, iconifiable);
 		setParentFrame(parent);
 		setFocusTraversalKeysEnabled(false);
@@ -100,8 +100,7 @@ public class MDIDesktopFrame extends JInternalFrame {
 	 */
 	protected void setParentFrame(JComponent parent) {
 		desktopPane = JOptionPane.getDesktopPaneForComponent(parent);
-		this.parent = parent == null ? JOptionPane
-				.getDesktopPaneForComponent(parent) : parent;
+		this.parent = parent == null ? JOptionPane.getDesktopPaneForComponent(parent) : parent;
 	}
 
 	/**
@@ -147,10 +146,8 @@ public class MDIDesktopFrame extends JInternalFrame {
 		addVetoableChangeListener(new VetoableChangeListener() {
 
 			@Override
-			public void vetoableChange(PropertyChangeEvent evt)
-					throws PropertyVetoException {
-				if (evt.getPropertyName().equals(
-						JInternalFrame.IS_SELECTED_PROPERTY)
+			public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
+				if (evt.getPropertyName().equals(JInternalFrame.IS_SELECTED_PROPERTY)
 						&& evt.getNewValue().equals(Boolean.TRUE)) {
 					if (isIcon) {
 						setIcon(false);
@@ -162,8 +159,7 @@ public class MDIDesktopFrame extends JInternalFrame {
 						}
 						throw new PropertyVetoException("no!", evt);
 					}
-				} else if (evt.getPropertyName().equals(
-						JInternalFrame.IS_ICON_PROPERTY)
+				} else if (evt.getPropertyName().equals(JInternalFrame.IS_ICON_PROPERTY)
 						&& evt.getNewValue().equals(Boolean.TRUE)) {
 					if (getParentFrame() instanceof MDIDesktopFrame) {
 						((MDIDesktopFrame) getParentFrame()).setIcon(true);
@@ -174,8 +170,8 @@ public class MDIDesktopFrame extends JInternalFrame {
 	}
 
 	/**
-	 * Method to control the display of the glasspane, dependent on the frame
-	 * being active or not
+	 * Method to control the display of the glasspane, dependent on the frame being
+	 * active or not
 	 */
 	protected void addFrameListener() {
 		addInternalFrameListener(new InternalFrameAdapter() {
@@ -234,8 +230,7 @@ public class MDIDesktopFrame extends JInternalFrame {
 						@Override
 						public void run() {
 							MDIDesktopFrame mdiFrame = (MDIDesktopFrame) parent;
-							if (mdiFrame.hasChildFrame()
-									&& mdiFrame.childFrame.isClosed()) {
+							if (mdiFrame.hasChildFrame() && mdiFrame.childFrame.isClosed()) {
 								((MDIDesktopFrame) parent).childClosing();
 							}
 						}
@@ -246,8 +241,8 @@ public class MDIDesktopFrame extends JInternalFrame {
 	}
 
 	/**
-	 * Method to handle child frame closing and make this frame available for
-	 * user input again with no glasspane visible
+	 * Method to handle child frame closing and make this frame available for user
+	 * input again with no glasspane visible
 	 */
 	protected void childClosing() {
 		setClosable(wasCloseable);
@@ -259,7 +254,9 @@ public class MDIDesktopFrame extends JInternalFrame {
 					try {
 						moveToFront();
 						setSelected(true);
-						focusOwner.grabFocus();
+						if (!glassPaneLocked) {
+							focusOwner.grabFocus();
+						}
 					} catch (PropertyVetoException ex) {
 						// This should only happen in the event that one child
 						// frame is closing and another is being opened
@@ -275,7 +272,9 @@ public class MDIDesktopFrame extends JInternalFrame {
 					}
 				}
 			});
-			focusOwner.grabFocus();
+			if (!glassPaneLocked) {
+				focusOwner.grabFocus();
+			}
 		}
 		setChildFrame(null);
 	}
@@ -290,8 +289,7 @@ public class MDIDesktopFrame extends JInternalFrame {
 		focusOwner = (JComponent) getFocusOwner();
 		grabFocus();
 		getGlassPane().setVisible(true);
-		getGlassPane()
-				.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		getGlassPane().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 	}
 
 	@Override
@@ -326,8 +324,8 @@ public class MDIDesktopFrame extends JInternalFrame {
 
 	/**
 	 * Glass pane to overlay. Listens for mouse clicks and sets selected on
-	 * associated modal frame. Also if modal frame has no children make class
-	 * pane invisible
+	 * associated modal frame. Also if modal frame has no children make class pane
+	 * invisible
 	 * 
 	 * @author Dean
 	 */
@@ -346,6 +344,7 @@ public class MDIDesktopFrame extends JInternalFrame {
 					if (!modalFrame.isSelected()) {
 						try {
 							modalFrame.setSelected(true);
+							modalFrame.getGlassPane().requestFocusInWindow();
 							if (!modalFrame.hasChildFrame()) {
 								setVisible(false);
 							}
@@ -355,14 +354,31 @@ public class MDIDesktopFrame extends JInternalFrame {
 					}
 				}
 			});
-			addKeyListener(new KeyAdapter() {
 
-				@Override
-				public void keyPressed(KeyEvent e) {
-					e.consume();
-				}
-				
-			});
+			addKeyListener(new KeyAdapter() {});
+			
+			setFocusTraversalPolicy(new FocusTraversalPolicy() {
+		        @Override
+		        public Component getLastComponent(Container aContainer) {
+		            return ModalInternalGlassPane.this;
+		        }
+		        @Override
+		        public Component getFirstComponent(Container aContainer) {
+		            return ModalInternalGlassPane.this;
+		        }
+		        @Override
+		        public Component getDefaultComponent(Container aContainer) {
+		            return ModalInternalGlassPane.this;
+		        }
+		        @Override
+		        public Component getComponentBefore(Container aContainer, Component aComponent) {
+		            return ModalInternalGlassPane.this;
+		        }
+		        @Override
+		        public Component getComponentAfter(Container aContainer, Component aComponent) {
+		            return ModalInternalGlassPane.this;
+		        }
+		    });
 		}
 
 		@Override
@@ -379,6 +395,7 @@ public class MDIDesktopFrame extends JInternalFrame {
 			g.setColor(new Color(255, 255, 255, 100));
 			g.fillRect(0, 0, getWidth(), getHeight());
 		}
+
 	}
 
 	public void lockGlassPane(boolean value) {
