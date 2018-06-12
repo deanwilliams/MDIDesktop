@@ -268,6 +268,7 @@ public class MDIDesktopFrame extends JInternalFrame {
 								// Do nothing
 							}
 							childFrame.moveToFront();
+							focusOwner = childFrame;
 						}
 					}
 				}
