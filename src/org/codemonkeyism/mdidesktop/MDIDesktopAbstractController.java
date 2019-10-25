@@ -19,6 +19,7 @@ public abstract class MDIDesktopAbstractController {
 	public void start() {
 		if (view != null) {
 			view.setVisible(true);
+			view.getFrame().toFront();
 		}
 	}
 	
